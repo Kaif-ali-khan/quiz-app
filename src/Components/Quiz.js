@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../Components/Quiz.css";
 
 const questionsArr = [
@@ -47,6 +47,8 @@ const Quiz = () => {
   const [currentQuestionIndex, setcurrentQuestionIndex] = useState(0);
   const [option, setOption] = useState();
   const [result, setResult] = useState(0);
+  const [timer, setTimer] = useState(10);
+  const [timerActive, setTimerActive] = useState(true);
 
   const nextBtn = () => {
     if (option === questionsArr[currentQuestionIndex]?.correctoption) {
@@ -54,10 +56,12 @@ const Quiz = () => {
     }
     setcurrentQuestionIndex(currentQuestionIndex + 1);
     setOption(null);
+    resetTimer();
   };
 
   const backBtn = () => {
     setcurrentQuestionIndex(currentQuestionIndex - 1);
+    resetTimer();
   };
 
   const optionCheck = (e) => {
@@ -69,6 +73,22 @@ const Quiz = () => {
   const percentage = Math.round((result / totalQuestions) * 100);
   const progressPercentage =
     ((currentQuestionIndex + 1) / totalQuestions) * 100;
+
+  const resetTimer = () => {
+    setTimer(10);
+  };
+
+  useEffect(() => {
+    let interval;
+    if (timerActive && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    } else if (timer === 0) {
+      nextBtn();
+    }
+    return () => clearInterval(interval);
+  }, [timer, timerActive]);
 
   return (
     <>
@@ -97,6 +117,20 @@ const Quiz = () => {
       ) : (
         <div className="container">
           <h1 className="mainHeading">Quiz App</h1>
+
+          {/* Timer */}
+          <div
+            className="timer"
+            style={{
+              position: "absolute",
+              top: "10px",
+              right: "10px",
+              fontSize: "20px",
+              fontWeight: "bold",
+            }}
+          >
+            {timer}s
+          </div>
 
           {/* Progress Bar */}
           <div className="progress-bar-container">
